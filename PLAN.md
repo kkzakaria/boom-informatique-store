@@ -66,12 +66,12 @@
 - [x] Configurer les migrations Prisma
 - [x] Tests de connexion base de données
 
-### 🔄 Phase 2 : Authentification et Gestion Utilisateur
-- [ ] Implémenter NextAuth.js
-- [ ] Créer les pages de connexion/inscription
-- [ ] Système de rôles (client/admin)
-- [ ] Gestion des profils utilisateur
-- [ ] Middleware d'authentification
+### ✅ Phase 2 : Authentification et Gestion Utilisateur
+- [x] Implémenter NextAuth.js
+- [x] Créer les pages de connexion/inscription
+- [x] Système de rôles (client/admin)
+- [x] Gestion des profils utilisateur
+- [x] Middleware d'authentification
 
 ### ⏳ Phase 3 : Catalogue de Produits
 - [ ] Page d'accueil avec produits vedettes
