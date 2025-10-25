@@ -136,7 +136,7 @@ export default function ProductsPage() {
               </p>
             </div>
             <Link href="/">
-              <Button variant="outline">Retour à l'accueil</Button>
+              <Button variant="outline">Retour à l&apos;accueil</Button>
             </Link>
           </div>
         </div>
@@ -198,7 +198,7 @@ export default function ProductsPage() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="createdAt">Date d'ajout</SelectItem>
+                        <SelectItem value="createdAt">Date d&apos;ajout</SelectItem>
                         <SelectItem value="name">Nom</SelectItem>
                         <SelectItem value="price">Prix</SelectItem>
                       </SelectContent>

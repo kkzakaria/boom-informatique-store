@@ -97,7 +97,7 @@ export default function SignInPage() {
           <div className="mt-6 text-center text-sm">
             <span className="text-gray-600">Pas encore de compte ? </span>
             <Link href="/auth/signup" className="text-blue-600 hover:underline">
-              S'inscrire
+              S&apos;inscrire
             </Link>
           </div>
         </CardContent>

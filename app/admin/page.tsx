@@ -170,7 +170,7 @@ async function DashboardStats() {
         <CardContent>
           <div className="text-2xl font-bold">{stats.totalRevenue.toFixed(2)} €</div>
           <p className="text-xs text-muted-foreground">
-            Chiffre d'affaires total
+            Chiffre d&apos;affaires total
           </p>
         </CardContent>
       </Card>

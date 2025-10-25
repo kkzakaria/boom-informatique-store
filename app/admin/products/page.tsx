@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -392,9 +393,11 @@ export default function AdminProductsPage() {
                 <TableRow key={product.id}>
                   <TableCell>
                     {product.images.length > 0 ? (
-                      <img
+                      <Image
                         src={product.images.find(img => img.isPrimary)?.url || product.images[0].url}
                         alt={product.name}
+                        width={48}
+                        height={48}
                         className="w-12 h-12 object-cover rounded"
                       />
                     ) : (

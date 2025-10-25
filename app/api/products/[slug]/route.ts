@@ -2,14 +2,14 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 export async function GET(request: Request, { params }: RouteParams) {
   try {
-    const { slug } = params
+    const { slug } = await params
 
     const product = await prisma.product.findFirst({
       where: {

@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Role } from "@/lib/generated/enums";
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,13 +15,13 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { role } = body;
 
     // Validate role
-    const validRoles = ['CUSTOMER', 'MANAGER', 'ADMIN'];
-    if (!role || !validRoles.includes(role)) {
+    const validRoles = Object.values(Role);
+    if (!role || !validRoles.includes(role as Role)) {
       return NextResponse.json({ error: "Invalid role" }, { status: 400 });
     }
 
@@ -41,7 +42,7 @@ export async function PUT(
     const updatedUser = await prisma.user.update({
       where: { id },
       data: {
-        role: role as any, // Type assertion for enum
+        role: role as Role,
       },
       select: {
         id: true,

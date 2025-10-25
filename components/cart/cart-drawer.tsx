@@ -171,7 +171,7 @@ export function CartDrawer() {
               </div>
 
               <p className="text-xs text-gray-500 text-center">
-                Livraison gratuite dès 50€ d'achat
+                Livraison gratuite dès 50€ d&apos;achat
               </p>
             </div>
           </div>

@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { OrderStatus } from "@/lib/generated/enums";
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,13 +15,13 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { status } = body;
 
     // Validate status
-    const validStatuses = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED'];
-    if (!status || !validStatuses.includes(status)) {
+    const validStatuses = Object.values(OrderStatus);
+    if (!status || !validStatuses.includes(status as OrderStatus)) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
 
@@ -36,7 +37,7 @@ export async function PUT(
     const updatedOrder = await prisma.order.update({
       where: { id },
       data: {
-        status: status as any, // Type assertion for enum
+        status: status as OrderStatus,
         updatedAt: new Date(),
       },
       include: {

@@ -30,7 +30,8 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit
 
     // Construire les conditions de filtrage
-    const where: any = {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const where: Record<string, any> = {
       isActive: true,
     }
 

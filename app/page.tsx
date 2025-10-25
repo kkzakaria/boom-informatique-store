@@ -33,7 +33,7 @@ export default function Home() {
               Votre magasin informatique en ligne
             </h2>
             <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
-              Découvrez notre sélection d'ordinateurs, accessoires et composants informatiques.
+              Découvrez notre sélection d&apos;ordinateurs, accessoires et composants informatiques.
               Qualité, prix compétitifs et livraison rapide.
             </p>
             <div className="mt-8 flex gap-4 justify-center">

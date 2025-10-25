@@ -217,7 +217,7 @@ export default function AdminUsersPage() {
                         </DialogTrigger>
                         <DialogContent>
                           <DialogHeader>
-                            <DialogTitle>Détails de l'utilisateur</DialogTitle>
+                            <DialogTitle>Détails de l&apos;utilisateur</DialogTitle>
                             <DialogDescription>
                               Informations détaillées sur {user.name || user.email}
                             </DialogDescription>
@@ -247,7 +247,7 @@ export default function AdminUsersPage() {
                               </div>
                             </div>
                             <div>
-                              <Label>Date d'inscription</Label>
+                              <Label>Date d&apos;inscription</Label>
                               <p className="text-sm text-muted-foreground">{formatDate(user.createdAt)}</p>
                             </div>
                           </div>
