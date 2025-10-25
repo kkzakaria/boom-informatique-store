@@ -99,9 +99,15 @@ export default function ProductsPageClient() {
       })
 
       const response = await fetch(`/api/products?${params}`)
-      const data: ProductsResponse = await response.json()
-      setProducts(data.products)
-      setPagination(data.pagination)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const data: any = await response.json()
+      if (data.error) {
+        throw new Error(data.error)
+      }
+      setProducts(data.products || [])
+      setPagination(data.pagination || null)
     } catch (error) {
       console.error("Erreur lors du chargement des produits:", error)
     } finally {
