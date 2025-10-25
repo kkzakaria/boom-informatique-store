@@ -57,14 +57,14 @@
 ## Plan de Développement (Phases)
 
 ### ✅ Phase 1 : Configuration et Base de Données
-- [ ] Installer et configurer Prisma avec PostgreSQL
-- [ ] Créer les schémas de base de données :
+- [x] Installer et configurer Prisma avec PostgreSQL
+- [x] Créer les schémas de base de données :
   - Utilisateurs (clients, admins)
   - Produits (avec catégories, images, stock)
   - Commandes et détails de commande
   - Paniers et sessions
-- [ ] Configurer les migrations Prisma
-- [ ] Tests de connexion base de données
+- [x] Configurer les migrations Prisma
+- [x] Tests de connexion base de données
 
 ### 🔄 Phase 2 : Authentification et Gestion Utilisateur
 - [ ] Implémenter NextAuth.js
