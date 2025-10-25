@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { AuthNav } from "@/components/auth/auth-nav"
 import { CartDrawer } from "@/components/cart/cart-drawer"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -19,7 +18,6 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-4">
               <CartDrawer />
-              <AuthNav />
             </div>
           </div>
         </div>

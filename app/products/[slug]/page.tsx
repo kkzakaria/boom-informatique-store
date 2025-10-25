@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation"
 import { Metadata } from "next"
-import { prisma } from "@/lib/prisma"
+import { createClient } from "@/utils/supabase/server"
 import { ProductPageClient } from "@/components/product/product-page-client"
 
 interface ProductPageProps {
@@ -12,18 +12,20 @@ interface ProductPageProps {
 // Generate metadata for SEO
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   try {
-    const product = await prisma.product.findUnique({
-      where: { slug: params.slug },
-      include: {
-        category: true,
-        images: {
-          where: { isPrimary: true },
-          take: 1,
-        },
-      },
-    })
+    const supabase = await createClient()
 
-    if (!product) {
+    const { data: product, error } = await supabase
+      .from('products')
+      .select(`
+        *,
+        category:categories(*),
+        images:product_images(*)
+      `)
+      .eq('slug', params.slug)
+      .eq('isActive', true)
+      .single()
+
+    if (error || !product) {
       return {
         title: "Produit non trouvé | Boom Informatique Store",
       }
@@ -31,7 +33,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
     const productUrl = `${baseUrl}/products/${product.slug}`
-    const productImage = product.images[0]?.url
+    const productImage = product.images?.[0]?.url
       ? `${baseUrl}${product.images[0].url}`
       : `${baseUrl}/placeholder-product.jpg`
 
@@ -39,17 +41,17 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
       title: `${product.name} | Boom Informatique Store`,
       description: product.description
         ? product.description.substring(0, 160)
-        : `Découvrez ${product.name} - ${product.price.toFixed(2)}€. Livraison rapide et garantie qualité.`,
+        : `Découvrez ${product.name} - ${product.price}€. Livraison rapide et garantie qualité.`,
       keywords: [
         product.name,
         product.brand || "",
-        product.category.name,
+        product.category?.name || "",
         "informatique",
         "achat en ligne",
         "e-commerce"
       ].filter(Boolean),
       openGraph: {
-        title: `${product.name} - ${product.price.toFixed(2)}€`,
+        title: `${product.name} - ${product.price}€`,
         description: product.description || `Découvrez ${product.name} chez Boom Informatique Store`,
         url: productUrl,
         images: [
@@ -79,34 +81,37 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   }
 }
 
-// Fetch product data for metadata
+// Fetch product data
 async function getProduct(slug: string) {
   try {
-    const product = await prisma.product.findUnique({
-      where: { slug },
-      include: {
-        category: true,
-        images: {
-          where: { isPrimary: true },
-          take: 1,
-        },
-      },
-    })
+    const supabase = await createClient()
 
-    if (!product) return null
+    const { data: product, error } = await supabase
+      .from('products')
+      .select(`
+        *,
+        category:categories(*),
+        images:product_images(*),
+        variants:product_variants(*)
+      `)
+      .eq('slug', slug)
+      .eq('isActive', true)
+      .single()
 
-    // Convert Decimal to number and transform data for compatibility
+    if (error || !product) return null
+
+    // Transform data for compatibility
     return {
       ...product,
       price: Number(product.price),
       comparePrice: product.comparePrice ? Number(product.comparePrice) : null,
       costPrice: product.costPrice ? Number(product.costPrice) : null,
       weight: product.weight ? Number(product.weight) : null,
-      images: product.images.map(img => ({
+      images: product.images?.map((img: any) => ({
         url: img.url,
         alt: img.alt || product.name,
         isPrimary: img.isPrimary,
-      })),
+      })) || [],
     }
   } catch (error) {
     return null

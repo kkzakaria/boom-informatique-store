@@ -2,10 +2,8 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { signOut, useSession } from "next-auth/react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import {
   LayoutDashboard,
@@ -14,7 +12,6 @@ import {
   Users,
   BarChart3,
   Settings,
-  LogOut,
   Store,
   Menu
 } from "lucide-react"
@@ -30,7 +27,6 @@ const navigation = [
 
 function NavContent({ onLinkClick }: { onLinkClick?: () => void }) {
   const pathname = usePathname()
-  const { data: session } = useSession()
 
   return (
     <div className="flex flex-col h-full">
@@ -63,45 +59,17 @@ function NavContent({ onLinkClick }: { onLinkClick?: () => void }) {
       </nav>
 
       <div className="border-t p-4">
-        <div className="flex items-center gap-3 mb-3">
-          <Avatar className="h-8 w-8">
-            <AvatarFallback>
-              {session?.user?.name?.charAt(0) || session?.user?.email?.charAt(0) || "A"}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">
-              {session?.user?.name || "Admin"}
-            </p>
-            <p className="text-xs text-gray-500 truncate">
-              {session?.user?.email}
-            </p>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full justify-start"
-            asChild
-          >
-            <Link href="/" onClick={onLinkClick}>
-              <Store className="h-4 w-4 mr-2" />
-              Voir la boutique
-            </Link>
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
-            onClick={() => signOut({ callbackUrl: "/" })}
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Déconnexion
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full justify-start"
+          asChild
+        >
+          <Link href="/" onClick={onLinkClick}>
+            <Store className="h-4 w-4 mr-2" />
+            Voir la boutique
+          </Link>
+        </Button>
       </div>
     </div>
   )
