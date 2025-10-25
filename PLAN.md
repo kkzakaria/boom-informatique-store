@@ -73,12 +73,12 @@
 - [x] Gestion des profils utilisateur
 - [x] Middleware d'authentification
 
-### 🔄 Phase 3 : Catalogue de Produits
+### ✅ Phase 3 : Catalogue de Produits
 - [x] Page d'accueil avec produits vedettes
 - [x] Catalogue avec pagination et filtres
 - [x] Recherche par texte et catégories
-- [ ] Pages de détail produit
-- [ ] Gestion des images produit (upload/optimisation)
+- [x] Pages de détail produit
+- [x] Gestion des images produit (upload/optimisation)
 
 ### ⏳ Phase 4 : Fonctionnalités E-commerce
 - [ ] Panier d'achat (ajout, modification, suppression)
