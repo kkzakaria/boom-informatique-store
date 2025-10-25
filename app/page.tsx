@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { AuthNav } from "@/components/auth/auth-nav"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -31,9 +32,12 @@ export default function Home() {
               Découvrez notre sélection d'ordinateurs, accessoires et composants informatiques.
               Qualité, prix compétitifs et livraison rapide.
             </p>
-            <div className="mt-8">
-              <Button size="lg" className="text-lg px-8 py-3">
-                Explorer nos produits
+            <div className="mt-8 flex gap-4 justify-center">
+              <Button size="lg" className="text-lg px-8 py-3" asChild>
+                <Link href="/products">Explorer nos produits</Link>
+              </Button>
+              <Button size="lg" variant="outline" className="text-lg px-8 py-3" asChild>
+                <Link href="/products?featured=true">Produits vedettes</Link>
               </Button>
             </div>
           </div>
@@ -62,8 +66,10 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" className="w-full">
-                  Voir les produits
+                <Button variant="outline" className="w-full" asChild>
+                  <Link href="/products?category=ordinateurs-portables">
+                    Voir les produits
+                  </Link>
                 </Button>
               </CardContent>
             </Card>
@@ -77,8 +83,10 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" className="w-full">
-                  Voir les produits
+                <Button variant="outline" className="w-full" asChild>
+                  <Link href="/products?category=composants">
+                    Voir les produits
+                  </Link>
                 </Button>
               </CardContent>
             </Card>
@@ -92,8 +100,10 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" className="w-full">
-                  Voir les produits
+                <Button variant="outline" className="w-full" asChild>
+                  <Link href="/products?category=peripheriques">
+                    Voir les produits
+                  </Link>
                 </Button>
               </CardContent>
             </Card>
@@ -107,8 +117,10 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" className="w-full">
-                  Voir les produits
+                <Button variant="outline" className="w-full" asChild>
+                  <Link href="/products?category=logiciels">
+                    Voir les produits
+                  </Link>
                 </Button>
               </CardContent>
             </Card>
