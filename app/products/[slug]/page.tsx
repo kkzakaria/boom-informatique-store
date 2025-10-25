@@ -3,6 +3,12 @@ import { Metadata } from "next"
 import { createClient } from "@/utils/supabase/server"
 import { ProductPageClient } from "@/components/product/product-page-client"
 
+interface ProductImage {
+  url: string
+  alt?: string
+  isPrimary?: boolean
+}
+
 interface ProductPageProps {
   params: {
     slug: string
@@ -107,7 +113,7 @@ async function getProduct(slug: string) {
       comparePrice: product.comparePrice ? Number(product.comparePrice) : null,
       costPrice: product.costPrice ? Number(product.costPrice) : null,
       weight: product.weight ? Number(product.weight) : null,
-      images: product.images?.map((img: any) => ({
+      images: product.images?.map((img: ProductImage) => ({
         url: img.url,
         alt: img.alt || product.name,
         isPrimary: img.isPrimary,
