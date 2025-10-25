@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { signIn, getSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -10,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
+import { createClient } from "@/utils/supabase/client"
 
 export default function SignInPage() {
   const [email, setEmail] = useState("")
@@ -17,6 +17,7 @@ export default function SignInPage() {
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const supabase = createClient()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -24,17 +25,14 @@ export default function SignInPage() {
     setError("")
 
     try {
-      const result = await signIn("credentials", {
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
-        redirect: false,
       })
 
-      if (result?.error) {
+      if (error) {
         setError("Email ou mot de passe incorrect")
       } else {
-        // Rafraîchir la session et rediriger
-        await getSession()
         router.push("/")
         router.refresh()
       }

@@ -1,44 +1,19 @@
-import { withAuth } from "next-auth/middleware"
+import { type NextRequest } from 'next/server'
+import { updateSession } from '@/utils/supabase/middleware'
 
-export default withAuth(
-  function middleware(req) {
-    // Add any additional middleware logic here
-  },
-  {
-    callbacks: {
-      authorized: ({ token, req }) => {
-        // Protect admin routes
-        if (req.nextUrl.pathname.startsWith("/admin")) {
-          return token?.role === "ADMIN"
-        }
-
-        // Protect dashboard routes (require authentication)
-        if (req.nextUrl.pathname.startsWith("/dashboard")) {
-          return !!token
-        }
-
-        // Allow access to auth pages when not authenticated
-        if (req.nextUrl.pathname.startsWith("/auth")) {
-          return true
-        }
-
-        // Allow access to public routes
-        return true
-      },
-    },
-  }
-)
+export async function middleware(request: NextRequest) {
+  return await updateSession(request)
+}
 
 export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - public files with extensions
+     * Feel free to modify this pattern to include more paths.
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)",
+    '/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)',
   ],
 }

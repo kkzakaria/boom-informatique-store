@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { createClient } from "@/utils/supabase/server"
 
 interface RouteParams {
   params: Promise<{
@@ -10,22 +10,21 @@ interface RouteParams {
 export async function GET(request: Request, { params }: RouteParams) {
   try {
     const { slug } = await params
+    const supabase = await createClient()
 
-    const product = await prisma.product.findFirst({
-      where: {
-        slug,
-        isActive: true,
-      },
-      include: {
-        category: true,
-        images: {
-          orderBy: { order: "asc" },
-        },
-        variants: true,
-      },
-    })
+    const { data: product, error } = await supabase
+      .from('products')
+      .select(`
+        *,
+        category:categories(*),
+        images:product_images(*),
+        variants:product_variants(*)
+      `)
+      .eq('slug', slug)
+      .eq('isActive', true)
+      .single()
 
-    if (!product) {
+    if (error || !product) {
       return NextResponse.json(
         { error: "Produit non trouvé" },
         { status: 404 }

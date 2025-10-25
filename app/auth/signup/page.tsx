@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -10,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
+import { createClient } from "@/utils/supabase/client"
 
 export default function SignUpPage() {
   const [name, setName] = useState("")
@@ -19,6 +19,7 @@ export default function SignUpPage() {
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const supabase = createClient()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,37 +33,50 @@ export default function SignUpPage() {
     }
 
     try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-        }),
+      // Sign up with Supabase Auth
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name: name,
+          }
+        }
       })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.error || "Une erreur est survenue")
+      if (signUpError) {
+        setError(signUpError.message)
         return
       }
 
-      // Connexion automatique après inscription
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      })
+      if (data.user) {
+        // Create user profile in our custom users table
+        const { error: profileError } = await supabase
+          .from('users')
+          .insert({
+            id: data.user.id,
+            email: data.user.email!,
+            name: name,
+          })
 
-      if (result?.error) {
-        setError("Inscription réussie mais erreur de connexion")
-      } else {
-        router.push("/")
-        router.refresh()
+        if (profileError) {
+          console.error('Error creating user profile:', profileError)
+          setError("Erreur lors de la création du profil utilisateur")
+          return
+        }
+
+        // Auto sign in after successful registration
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        })
+
+        if (signInError) {
+          setError("Inscription réussie mais erreur de connexion")
+        } else {
+          router.push("/")
+          router.refresh()
+        }
       }
     } catch (error) {
       setError("Une erreur est survenue lors de l'inscription")

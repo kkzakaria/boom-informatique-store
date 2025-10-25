@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { createClient } from "@/utils/supabase/server"
 import { z } from "zod"
 
 const productsQuerySchema = z.object({
@@ -27,56 +27,54 @@ export async function GET(request: NextRequest) {
 
     const page = parseInt(query.page)
     const limit = parseInt(query.limit)
-    const skip = (page - 1) * limit
+    const from = (page - 1) * limit
+    const to = from + limit - 1
 
-    // Construire les conditions de filtrage
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const where: Record<string, any> = {
-      isActive: true,
-    }
+    const supabase = await createClient()
 
+    // Build the query
+    let supabaseQuery = supabase
+      .from('products')
+      .select(`
+        *,
+        category:categories(*),
+        images:product_images!inner(*)
+      `, { count: 'exact' })
+      .eq('isActive', true)
+      .eq('product_images.isPrimary', true)
+      .range(from, to)
+      .order(query.sortBy, { ascending: query.sortOrder === 'asc' })
+
+    // Add category filter
     if (query.category) {
-      where.category = {
-        slug: query.category,
-      }
+      supabaseQuery = supabaseQuery.eq('categories.slug', query.category)
     }
 
+    // Add search filter
     if (query.search) {
-      where.OR = [
-        { name: { contains: query.search, mode: "insensitive" } },
-        { description: { contains: query.search, mode: "insensitive" } },
-        { brand: { contains: query.search, mode: "insensitive" } },
-      ]
+      supabaseQuery = supabaseQuery.or(`name.ilike.%${query.search}%,description.ilike.%${query.search}%,brand.ilike.%${query.search}%`)
     }
 
+    // Add featured filter
     if (query.featured === "true") {
-      where.isFeatured = true
+      supabaseQuery = supabaseQuery.eq('isFeatured', true)
     }
 
-    // Compter le nombre total de produits
-    const total = await prisma.product.count({ where })
+    const { data: products, error, count } = await supabaseQuery
 
-    // Récupérer les produits
-    const products = await prisma.product.findMany({
-      where,
-      include: {
-        category: true,
-        images: {
-          where: { isPrimary: true },
-          take: 1,
-        },
-      },
-      orderBy: {
-        [query.sortBy]: query.sortOrder,
-      },
-      skip,
-      take: limit,
-    })
+    if (error) {
+      console.error("Erreur Supabase:", error)
+      return NextResponse.json(
+        { error: "Erreur lors de la récupération des produits" },
+        { status: 500 }
+      )
+    }
 
+    const total = count || 0
     const totalPages = Math.ceil(total / limit)
 
     return NextResponse.json({
-      products,
+      products: products || [],
       pagination: {
         page,
         limit,

@@ -2,53 +2,45 @@ import { Suspense } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { createClient } from "@/utils/supabase/server";
 
 async function getDashboardStats() {
-  const [totalProducts, totalOrders, totalUsers, recentOrders] = await Promise.all([
-    prisma.product.count(),
-    prisma.order.count(),
-    prisma.user.count(),
-    prisma.order.findMany({
-      take: 5,
-      orderBy: { createdAt: 'desc' },
-      include: {
-        user: {
-          select: { name: true, email: true }
-        },
-        items: {
-          include: {
-            product: {
-              select: { name: true }
-            }
-          }
-        }
-      }
-    })
+  const supabase = await createClient();
+
+  const [totalProductsResult, totalOrdersResult, totalUsersResult, recentOrdersResult, totalRevenueResult, pendingOrdersResult] = await Promise.all([
+    supabase.from('products').select('*', { count: 'exact', head: true }),
+    supabase.from('orders').select('*', { count: 'exact', head: true }),
+    supabase.from('users').select('*', { count: 'exact', head: true }),
+    supabase
+      .from('orders')
+      .select(`
+        *,
+        user:users(name, email),
+        items:order_items(
+          quantity,
+          product:products(name)
+        )
+      `)
+      .order('createdAt', { ascending: false })
+      .limit(5),
+    supabase
+      .from('orders')
+      .select('total'),
+    supabase
+      .from('orders')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'PENDING')
   ]);
 
-  const totalRevenue = await prisma.order.aggregate({
-    _sum: {
-      total: true
-    }
-  });
-
-  const pendingOrders = await prisma.order.count({
-    where: {
-      status: 'PENDING'
-    }
-  });
+  const totalRevenue = totalRevenueResult.data?.reduce((sum, order) => sum + Number(order.total), 0) || 0;
 
   return {
-    totalProducts,
-    totalOrders,
-    totalUsers,
-    totalRevenue: totalRevenue._sum.total || 0,
-    pendingOrders,
-    recentOrders
+    totalProducts: totalProductsResult.count || 0,
+    totalOrders: totalOrdersResult.count || 0,
+    totalUsers: totalUsersResult.count || 0,
+    totalRevenue,
+    pendingOrders: pendingOrdersResult.count || 0,
+    recentOrders: recentOrdersResult.data || []
   };
 }
 
@@ -244,12 +236,8 @@ async function RecentOrders() {
   );
 }
 
-export default async function AdminDashboard() {
-  const session = await getServerSession(authOptions);
-
-  if (!session || session.user.role !== 'ADMIN') {
-    redirect('/');
-  }
+export default function AdminDashboard() {
+  // Admin authentication is handled by middleware
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">

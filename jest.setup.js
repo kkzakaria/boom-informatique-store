@@ -20,15 +20,25 @@ jest.mock('next/navigation', () => ({
   },
 }))
 
-// Mock next-auth
-jest.mock('next-auth/react', () => ({
-  useSession: jest.fn(() => ({
-    data: null,
-    status: 'unauthenticated',
+// Mock Supabase
+jest.mock('@supabase/supabase-js', () => ({
+  createClient: jest.fn(() => ({
+    auth: {
+      getUser: jest.fn(() => Promise.resolve({ data: { user: null }, error: null })),
+      signInWithPassword: jest.fn(),
+      signUp: jest.fn(),
+      signOut: jest.fn(),
+      onAuthStateChange: jest.fn(() => ({ data: { subscription: { unsubscribe: jest.fn() } } })),
+    },
+    from: jest.fn(() => ({
+      select: jest.fn(() => ({
+        eq: jest.fn(() => ({
+          single: jest.fn(() => Promise.resolve({ data: null, error: null })),
+        })),
+      })),
+      insert: jest.fn(() => Promise.resolve({ data: null, error: null })),
+    })),
   })),
-  signIn: jest.fn(),
-  signOut: jest.fn(),
-  getSession: jest.fn(),
 }))
 
 // Mock environment variables

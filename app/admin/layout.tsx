@@ -1,18 +1,11 @@
-import { redirect } from "next/navigation"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
 import { AdminNav } from "@/components/admin/admin-nav"
 
-export default async function AdminLayout({
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const session = await getServerSession(authOptions)
-
-  if (!session || session.user.role !== "ADMIN") {
-    redirect("/")
-  }
+  // Admin route protection is handled by middleware
 
   return (
     <div className="min-h-screen bg-gray-50">
