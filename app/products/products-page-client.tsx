@@ -79,10 +79,17 @@ export default function ProductsPageClient() {
   const fetchCategories = async () => {
     try {
       const response = await fetch("/api/categories")
-      const data = await response.json()
-      setCategories(data.categories)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const data: any = await response.json()
+      if (data.error) {
+        throw new Error(data.error)
+      }
+      setCategories(data.categories || [])
     } catch (error) {
       console.error("Erreur lors du chargement des catégories:", error)
+      setCategories([])
     }
   }
 
@@ -110,6 +117,8 @@ export default function ProductsPageClient() {
       setPagination(data.pagination || null)
     } catch (error) {
       console.error("Erreur lors du chargement des produits:", error)
+      setProducts([])
+      setPagination(null)
     } finally {
       setLoading(false)
     }
