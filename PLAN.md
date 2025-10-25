@@ -80,8 +80,8 @@
 - [x] Pages de détail produit
 - [x] Gestion des images produit (upload/optimisation)
 
-### ⏳ Phase 4 : Fonctionnalités E-commerce
-- [ ] Panier d'achat (ajout, modification, suppression)
+### 🔄 Phase 4 : Fonctionnalités E-commerce
+- [x] Panier d'achat (ajout, modification, suppression)
 - [ ] Processus de checkout
 - [ ] Intégration Stripe pour paiements
 - [ ] Confirmation de commande par email

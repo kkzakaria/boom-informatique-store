@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { AuthNav } from "@/components/auth/auth-nav"
+import { CartDrawer } from "@/components/cart/cart-drawer"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Laptop, Smartphone, Headphones, Monitor } from "lucide-react"
@@ -16,7 +17,10 @@ export default function Home() {
                 Boom Informatique
               </h1>
             </div>
-            <AuthNav />
+            <div className="flex items-center gap-4">
+              <CartDrawer />
+              <AuthNav />
+            </div>
           </div>
         </div>
       </header>
