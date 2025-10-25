@@ -2,8 +2,9 @@
 // E-commerce database schema for computer hardware and software store
 
 generator client {
-  provider = "prisma-client"
-  output   = "../lib/generated"
+  provider      = "prisma-client"
+  output        = "../lib/generated"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
