@@ -1,10 +1,14 @@
+"use client"
+
 import { notFound } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, ShoppingCart, Star, Truck, Shield, RotateCcw } from "lucide-react"
+import { useCartStore } from "@/lib/stores/cart-store"
+import { ArrowLeft, ShoppingCart, Star, Truck, Shield, RotateCcw, Check } from "lucide-react"
 
 interface ProductPageProps {
   params: {
@@ -12,17 +16,69 @@ interface ProductPageProps {
   }
 }
 
-export default async function ProductPage({ params }: ProductPageProps) {
+export default function ProductPage({ params }: ProductPageProps) {
+  const [product, setProduct] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [addingToCart, setAddingToCart] = useState(false)
+  const [addedToCart, setAddedToCart] = useState(false)
+  const { addItem } = useCartStore()
+
   // Fetch product data
-  const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/products/${params.slug}`, {
-    cache: 'no-store' // Ensure fresh data
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await fetch(`/api/products/${params.slug}`)
+        if (!response.ok) {
+          notFound()
+        }
+        const { product: productData } = await response.json()
+        if (!productData) {
+          notFound()
+        }
+        setProduct(productData)
+      } catch (error) {
+        console.error('Error fetching product:', error)
+        notFound()
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProduct()
   })
 
-  if (!response.ok) {
-    notFound()
+  const handleAddToCart = async () => {
+    if (!product || product.stock === 0) return
+
+    setAddingToCart(true)
+    try {
+      addItem({
+        id: `${product.id}-${Date.now()}`,
+        productId: product.id,
+        name: product.name,
+        slug: product.slug,
+        price: product.price,
+        image: product.images[0]?.url || "/placeholder-product.jpg",
+        stock: product.stock,
+        maxQuantity: product.stock,
+      })
+
+      setAddedToCart(true)
+      setTimeout(() => setAddedToCart(false), 2000)
+    } catch (error) {
+      console.error('Error adding to cart:', error)
+    } finally {
+      setAddingToCart(false)
+    }
   }
 
-  const { product } = await response.json()
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    )
+  }
 
   if (!product) {
     notFound()
@@ -150,10 +206,25 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <Button
                 size="lg"
                 className="w-full"
-                disabled={product.stock === 0}
+                disabled={product.stock === 0 || addingToCart}
+                onClick={handleAddToCart}
               >
-                <ShoppingCart className="w-5 h-5 mr-2" />
-                {product.stock > 0 ? 'Ajouter au panier' : 'Indisponible'}
+                {addingToCart ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Ajout en cours...
+                  </>
+                ) : addedToCart ? (
+                  <>
+                    <Check className="w-5 h-5 mr-2" />
+                    Ajouté au panier !
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    {product.stock > 0 ? 'Ajouter au panier' : 'Indisponible'}
+                  </>
+                )}
               </Button>
 
               <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
