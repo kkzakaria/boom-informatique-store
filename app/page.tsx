@@ -1,10 +1,24 @@
+"use client";
+
 import Link from "next/link"
 import { CartDrawer } from "@/components/cart/cart-drawer"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Laptop, Smartphone, Headphones, Monitor } from "lucide-react"
+import { useSession } from "@/components/auth/session-provider"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
 export default function Home() {
+  const { user, loading } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && user) {
+      // User is logged in, could redirect to dashboard or show different content
+    }
+  }, [user, loading, router]);
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -17,7 +31,28 @@ export default function Home() {
               </h1>
             </div>
             <div className="flex items-center gap-4">
-              <CartDrawer />
+              {user ? (
+                <div className="flex items-center gap-4">
+                  <span className="text-sm text-gray-700">
+                    Bonjour, {user.email}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => router.push('/admin')}
+                  >
+                    Admin
+                  </Button>
+                  <CartDrawer />
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href="/auth/signin">Connexion</Link>
+                  </Button>
+                  <CartDrawer />
+                </div>
+              )}
             </div>
           </div>
         </div>

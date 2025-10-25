@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { createClient } from "@/utils/supabase/server";
 
 // In a real application, you'd store these settings in a database
 // For this demo, we'll use a simple in-memory store or environment variables
@@ -22,9 +21,24 @@ let storeSettings = { ...defaultSettings };
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const supabase = await createClient();
 
-    if (!session || session.user.role !== 'ADMIN') {
+    const {
+      data: { user }
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Get user role from database
+    const { data: userData } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (!userData || userData.role !== 'ADMIN') {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -37,9 +51,24 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const supabase = await createClient();
 
-    if (!session || session.user.role !== 'ADMIN') {
+    const {
+      data: { user }
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Get user role from database
+    const { data: userData } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (!userData || userData.role !== 'ADMIN') {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
