@@ -61,7 +61,7 @@ export default function ProductsPageClient() {
 
   // Filtres
   const [search, setSearch] = useState(searchParams.get("search") || "")
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "")
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "all")
   const [sortBy, setSortBy] = useState(searchParams.get("sortBy") || "createdAt")
   const [sortOrder, setSortOrder] = useState(searchParams.get("sortOrder") || "desc")
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get("page") || "1"))
@@ -93,7 +93,7 @@ export default function ProductsPageClient() {
         page: currentPage.toString(),
         limit: "12",
         ...(search && { search }),
-        ...(selectedCategory && { category: selectedCategory }),
+        ...(selectedCategory !== "all" && { category: selectedCategory }),
         sortBy,
         sortOrder,
       })
@@ -117,7 +117,7 @@ export default function ProductsPageClient() {
 
   const clearFilters = () => {
     setSearch("")
-    setSelectedCategory("")
+    setSelectedCategory("all")
     setSortBy("createdAt")
     setSortOrder("desc")
     setCurrentPage(1)
@@ -179,7 +179,7 @@ export default function ProductsPageClient() {
                       <SelectValue placeholder="Toutes les catégories" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Toutes les catégories</SelectItem>
+                      <SelectItem value="all">Toutes les catégories</SelectItem>
                       {categories.map((category) => (
                         <SelectItem key={category.id} value={category.slug}>
                           {category.name} ({category._count.products})
