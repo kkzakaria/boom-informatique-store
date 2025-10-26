@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link"
-import { CartDrawer } from "@/components/cart/cart-drawer"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Laptop, Smartphone, Headphones, Monitor } from "lucide-react"
 import { useSession } from "@/components/auth/session-provider"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
+import Navbar from "@/components/navbar"
 
 export default function Home() {
   const { user, loading } = useSession();
@@ -21,42 +21,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-gray-900">
-                Boom Informatique
-              </h1>
-            </div>
-            <div className="flex items-center gap-4">
-              {user ? (
-                <div className="flex items-center gap-4">
-                  <span className="text-sm text-gray-700">
-                    Bonjour, {user.email}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => router.push('/admin')}
-                  >
-                    Admin
-                  </Button>
-                  <CartDrawer />
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href="/auth/signin">Connexion</Link>
-                  </Button>
-                  <CartDrawer />
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Hero Section */}
       <section className="bg-white">

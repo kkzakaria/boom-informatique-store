@@ -41,8 +41,8 @@ interface Category {
 }
 
 interface ProductsResponse {
-  products: Product[]
-  pagination: {
+  products?: Product[]
+  pagination?: {
     page: number
     limit: number
     total: number
@@ -50,6 +50,12 @@ interface ProductsResponse {
     hasNext: boolean
     hasPrev: boolean
   }
+  error?: string
+}
+
+interface CategoriesResponse {
+  categories?: Category[]
+  error?: string
 }
 
 export default function ProductsPageClient() {
@@ -82,7 +88,7 @@ export default function ProductsPageClient() {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
-      const data: any = await response.json()
+      const data: CategoriesResponse = await response.json()
       if (data.error) {
         throw new Error(data.error)
       }
@@ -109,7 +115,7 @@ export default function ProductsPageClient() {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
-      const data: any = await response.json()
+      const data: ProductsResponse = await response.json()
       if (data.error) {
         throw new Error(data.error)
       }
